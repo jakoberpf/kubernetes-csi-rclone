@@ -2,6 +2,19 @@
 
 Fork of https://github.com/wunderio/csi-rclone that is a bit slow with merging PRs
 
+**Forked from** https://zivgitlab.uni-muenster.de/m_wiga01/csi-rclone-owncloud
+**Updated from** https://github.com/wunderio/csi-rclone/compare/master...dvcrn:csi-rclone-reloaded:master
+
+https://www.airplane.dev/blog/kubernetes-ephemeral-storage
+https://kubernetes-csi.github.io/docs/csi-driver-object.html
+https://kubernetes-csi.github.io/docs/ephemeral-local-volumes.html
+https://github.com/dvcrn/csi-rclone-reloaded
+
+### Roadmap
+
+- add dropbox CI test with https://github.com/dropbox/dbxcli
+- add gdrive CI test with https://github.com/glotlabs/gdrive
+
 Differences with that fork:
 
 - Everything is under kube-system namespace
