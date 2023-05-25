@@ -26,6 +26,7 @@ jobs:
 
       - name: Run kubernetes tests
         run: |
+          ./test/helpers/bats-core/bin/bats test/test-minio.bats --print-output-on-failure
           ./test/helpers/bats-core/bin/bats test/test-dropbox.bats --print-output-on-failure
 
   docker:

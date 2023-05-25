@@ -24,11 +24,7 @@ setup_file() {
     # Deploy CSI Controller, Storage Class and Storage Plugin
     kubectl apply -f deploy/kubernetes/1.19
     # Wait for CSI Controller to be ready
-    while "$(kubectl get sts csi-controller-rclone -n kube-system -o yaml | yq '.status.replicas')" != "$(kubectl get sts csi-controller-rclone -n kube-system -o yaml | yq '.status.readyReplicas')"; do
-        echo >&2 'CSI Controller down, retrying in 1s...'
-        ((c++)) && ((c==60)) && exit 0
-        sleep 1
-    done
+    kubectl rollout status --watch --timeout=600s statefulset/csi-controller-rclone -n kube-system
 }
 
 @test "should have a rclone StorageClass" {
@@ -44,16 +40,16 @@ setup_file() {
 #@test "should be able to mount dropbox with global secret" {
 #    kubectl apply -f test/secret-dropbox.yaml -n kube-system
 #    kubectl apply -f test/pv.yaml -n kube-system
-#    kubectl apply -f test/pvc.yaml -n kube-system
-#    kubectl apply -f test/pod.yaml -n kube-system
+#    kubectl apply -f test/pvc-dropbox.yaml -n kube-system
+#    kubectl apply -f test/pod-dropbox.yaml -n kube-system
 #    run bash -c "kubectl describe storageclass rclone"
 #    assert_output --partial 'IsDefaultClass:  No'
 #}
 
 @test "should be able to mount dropbox with pv attributes" {
     kubectl apply -f test/pv-dropbox.yaml -n kube-system
-    kubectl apply -f test/pvc.yaml -n kube-system
-    kubectl apply -f test/pod.yaml -n kube-system
+    kubectl apply -f test/pvc-dropbox.yaml -n kube-system
+    kubectl apply -f test/pod-dropbox.yaml -n kube-system
     # Wait until producer pod is ready
     kubectl wait --for=condition=Ready pod/nginx-example -n kube-system
     run bash -c "kubectl describe storageclass rclone"

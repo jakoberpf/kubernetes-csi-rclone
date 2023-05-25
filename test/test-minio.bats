@@ -32,11 +32,8 @@ setup_file() {
     kind load docker-image jakoberpf/csi-rclone:ci --name "$KIND_CLUSTER_NAME"
     # Deploy CSI Controller, Storage Class and Storage Plugin
     kubectl apply -f deploy/kubernetes/1.19
-
-    kubectl apply -f test/secret-minio.yaml -n kube-system
-    kubectl apply -f test/pv.yaml -n kube-system
-    kubectl apply -f test/pvc.yaml -n kube-system
-    kubectl apply -f test/busybox.yaml -n kube-system
+    # Wait for CSI Controller to be ready
+    kubectl rollout status --watch --timeout=600s statefulset/csi-controller-rclone -n kube-system
 }
 
 @test "should have a rclone StorageClass" {
@@ -49,6 +46,26 @@ setup_file() {
     assert_output --partial 'IsDefaultClass:  No'
 }
 
+#@test "should be able to mount dropbox with global secret" {
+#    kubectl apply -f test/secret-dropbox.yaml -n kube-system
+#    kubectl apply -f test/pv.yaml -n kube-system
+#    kubectl apply -f test/pvc-dropbox.yaml -n kube-system
+#    kubectl apply -f test/pod-dropbox.yaml -n kube-system
+#    run bash -c "kubectl describe storageclass rclone"
+#    assert_output --partial 'IsDefaultClass:  No'
+#}
+
+@test "should be able to mount dropbox with pv attributes" {
+    kubectl apply -f test/pv-minio.yaml -n kube-system
+    kubectl apply -f test/pvc-minio.yaml -n kube-system
+    kubectl apply -f test/pod-minio.yaml -n kube-system
+    # Wait until producer pod is ready
+    kubectl wait --for=condition=Ready pod/nginx-example -n kube-system
+    run bash -c "kubectl describe storageclass rclone"
+    assert_output --partial 'IsDefaultClass:  No'
+}
+
 # teardown_file() {
 #     kind delete cluster --name "$KIND_CLUSTER_NAME"
 # }
+
