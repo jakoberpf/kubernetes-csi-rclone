@@ -95,7 +95,7 @@ func (ns *nodeServer) NodePublishVolume(ctx context.Context, req *csi.NodePublis
 }
 
 // extractFlags extracts the flags from the given volumeContext
-// Retturns: remote, remotePath, configData, flags, error
+// Returns: remote, remotePath, configData, flags, error
 func extractFlags(volumeContext map[string]string) (string, string, string, map[string]string, error) {
 	// Load default connection settings from secret
 	var secret *v1.Secret
@@ -116,7 +116,7 @@ func extractFlags(volumeContext map[string]string) (string, string, string, map[
 	// Empty argument list
 	flags := make(map[string]string)
 
-	// Secret values are default, gets merged and overriden by corresponding PV values
+	// Secret values are default, gets merged and overridden by corresponding PV values
 	if secret != nil && secret.Data != nil && len(secret.Data) > 0 {
 		// Needs byte to string casting for map values
 		for k, v := range secret.Data {
